@@ -5,7 +5,9 @@ const Cloud = {
   HEIGHT: 270,
   X: 100,
   Y: 10,
-  GAP: 10
+  GAP: 10,
+  COLOR: `rgba(0, 0, 0, 0.7)`,
+  SHADOW: `#ffffff`
 };
 
 const Bar = {
@@ -27,18 +29,20 @@ const Name = {
 };
 
 
-function renderCloud(ctx, x, y, color) {
-  ctx.fillStyle = color;
+function renderCloud(ctx, x, y, colorShadow, colorCloud) {
+  ctx.fillStyle = colorShadow;
+  ctx.fillRect(x + Cloud.GAP, y + Cloud.GAP, Cloud.WIDTH, Cloud.HEIGHT);
+  ctx.fillStyle = colorCloud;
   ctx.fillRect(x, y, Cloud.WIDTH, Cloud.HEIGHT);
 }
 
-function renderColumn(ctx, x, y, name, time, maxTime) {
+function renderColumn(ctx, x, y, name, height, color) {
   if (name === `Вы`) {
     ctx.fillStyle = `rgba(255, 0, 0, 1)`;
   } else {
-    ctx.fillStyle = `hsl(240,` + (Math.floor(Math.random() * (100 - 1 + 1)) + 1) + `%` + `, 50%)`;
+    ctx.fillStyle = color;
   }
-  ctx.fillRect(x, y, Bar.WIDTH, -(Bar.HEIGHT * time) / maxTime);
+  ctx.fillRect(x, y, Bar.WIDTH, height);
 }
 
 function renderText(ctx, x, y, text, color) {
@@ -57,19 +61,39 @@ function getMaxElement(arr) {
   return maxElement;
 }
 
+function showStats(ctx, shift, text, name, height, color) {
+  renderText(
+      ctx,
+      Name.X + shift,
+      Name.Y,
+      name
+  );
+
+  renderText(
+      ctx,
+      Name.X + shift,
+      Cloud.HEIGHT - Cloud.GAP * 2 - Font.HEIGHT + height,
+      text
+  );
+
+  renderColumn(
+      ctx,
+      Cloud.X + Bar.WIDTH + shift,
+      Cloud.HEIGHT - Cloud.GAP - Font.HEIGHT,
+      name,
+      height,
+      color
+  );
+}
+
 
 window.renderStatistics = function (ctx, names, times) {
   renderCloud(
       ctx,
       Cloud.X + Cloud.GAP,
       Cloud.Y + Cloud.GAP,
-      `rgba(0, 0, 0, 0.7)`
-  );
-  renderCloud(
-      ctx,
-      Cloud.X,
-      Cloud.Y,
-      `#ffffff`
+      Cloud.COLOR,
+      Cloud.SHADOW
   );
 
   ctx.font = `${Font.SIZE} ${Font.FAMILY}`;
@@ -94,30 +118,18 @@ window.renderStatistics = function (ctx, names, times) {
 
   for (let i = 0; i < names.length; i++) {
     const statShift = (Bar.WIDTH + Bar.GAP) * i;
+    const columnColor = `hsl(240,` + (Math.floor(Math.random() * (100 - 1 + 1)) + 1) + `%` + `, 50%)`;
     let barHeight = -((Bar.HEIGHT * times[i]) / maxTime);
     let playerTime = Math.round(times[i]).toString();
-    renderText(
-        ctx,
-        Name.X + statShift,
-        Name.Y,
-        names[i]
-    );
+    ctx.fillStyle = textColor;
 
-    renderColumn(
+    showStats(
         ctx,
-        // переменная для позиции Х?
-        Cloud.X + Bar.WIDTH + statShift,
-        Cloud.HEIGHT - Cloud.GAP - Font.HEIGHT,
+        statShift,
+        playerTime,
         names[i],
-        times[i],
-        maxTime
-    );
-
-    renderText(
-        ctx,
-        Name.X + statShift,
-        Cloud.HEIGHT - Cloud.GAP * 2 - Font.HEIGHT + barHeight,
-        playerTime
+        barHeight,
+        columnColor
     );
   }
 };
