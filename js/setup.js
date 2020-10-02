@@ -46,16 +46,25 @@ function getRandomNumber(min, max) {
 }
 
 // Генерация волшебника
-function getRandomWizard() {
-  let randomWizard = {};
-  randomWizard.name = `${
-    firstNames[getRandomNumber(0, firstNames.length - 1)]
-  } ${lastNames[getRandomNumber(0, lastNames.length - 1)]}`;
-  randomWizard.eyesColor = eyeColors[getRandomNumber(0, eyeColors.length - 1)];
-  randomWizard.coatColor = coatColors[getRandomNumber(0, coatColors.length - 1)];
+function getRandomWizards() {
+  const randomWizards = [];
 
-  return randomWizard;
+  for (let i = 0; i < SIMILAR_WIZARDS_NUM; i++) {
+    let randomWizard = {};
+    randomWizard.name = `${
+      firstNames[getRandomNumber(0, firstNames.length - 1)]
+    } ${lastNames[getRandomNumber(0, lastNames.length - 1)]}`;
+    randomWizard.eyesColor =
+      eyeColors[getRandomNumber(0, eyeColors.length - 1)];
+    randomWizard.coatColor =
+      coatColors[getRandomNumber(0, coatColors.length - 1)];
+
+    randomWizards.push(randomWizard);
+  }
+
+  return randomWizards;
 }
+const randomWizards = getRandomWizards();
 
 // Функция наполнения темплейта
 function insertWizard(obj) {
@@ -72,7 +81,7 @@ function insertWizard(obj) {
 function insertSimilarWizards() {
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < SIMILAR_WIZARDS_NUM; i++) {
-    fragment.appendChild(insertWizard(getRandomWizard()));
+    fragment.appendChild(insertWizard(randomWizards[i]));
   }
 
   return similarWizardsList.appendChild(fragment);
